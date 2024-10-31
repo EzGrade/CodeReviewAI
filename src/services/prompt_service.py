@@ -5,10 +5,12 @@ class Prompt:
     def __init__(
             self,
             system_prompt: str,
-            files_content: Dict[str, str]
+            files_content: Dict[str, str],
+            candidate_level: str
     ):
         self.system_prompt = system_prompt
         self.files_content = files_content
+        self.candidate_level = candidate_level
 
     def files_to_dict(self):
         messages = []
@@ -26,6 +28,10 @@ class Prompt:
         system_prompt_message: Dict[str, str] = {
             "role": "system",
             "content": self.system_prompt,
+        }
+        candidate_level_message: Dict[str, str] = {
+            "role": "system",
+            "content": f"Programmer Level: {self.candidate_level}"
         }
         messages.append(system_prompt_message)
         messages.extend(self.files_to_dict())
