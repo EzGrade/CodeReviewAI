@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 import logging
 
+from starlette.responses import JSONResponse
+
 from api.review.models import Review
 from services.github_service import Github
 from utils.url import extract_repo_from_url
@@ -20,3 +22,4 @@ async def review(request: Review):
         owner=repo_owner,
         repo=repo_name,
     )
+    return JSONResponse(content={"message": github_service.get_repository_files()})
