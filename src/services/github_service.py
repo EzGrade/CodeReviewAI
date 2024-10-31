@@ -15,7 +15,7 @@ class Github:
         )
 
         self.app_client = GithubIntegration(auth=self.auth)
-        self.installation_id = self.get_installation_id(owner, repo)
+        self.installation_id = self.get_installation_id(owner)
         self.client = self.app_client.get_github_for_installation(
             installation_id=self.installation_id,
         )
@@ -24,12 +24,10 @@ class Github:
     def get_installation_id(
             self,
             owner: str,
-            repo: str,
     ) -> str:
         """
         Get installation id for the repository
         :param owner:
-        :param repo:
         :return:
         """
         installations = self.app_client.get_installations()
