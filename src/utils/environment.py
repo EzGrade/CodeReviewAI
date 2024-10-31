@@ -14,6 +14,6 @@ def get_env_var(
     try:
         return os.environ[key]
     except KeyError as e:
-        if default:
+        if default is not None:
             return default
         raise RuntimeError(f"Environment variable {key} not set") from e
