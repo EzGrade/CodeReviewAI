@@ -24,7 +24,7 @@ class Github:
     def get_installation_id(
             self,
             owner: str,
-    ) -> str:
+    ) -> int:
         """
         Get installation id for the repository
         :param owner:
@@ -35,3 +35,4 @@ class Github:
             for installation in page:
                 if installation.account.login == owner:
                     return installation.id
+        raise RuntimeError("Installation not found")
