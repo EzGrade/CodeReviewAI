@@ -40,7 +40,7 @@ class Github:
             _owner = installation.get_repos()[0].owner.login
             if _owner == owner:
                 return installation.id
-        raise RuntimeError("Installation not found")
+        raise ValueError("Installation not found")
 
     def get_repository_files(
             self,
