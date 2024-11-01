@@ -11,7 +11,7 @@ def extract_repo_from_url(repo_url: str) -> tuple:
     :return:
     """
     logger.debug(f"Extracting owner and repo from URL: {repo_url}")
-    pattern = r'github\.com[:/](?P<owner>[^/]+)/(?P<repo>[^/]+)'
+    pattern = r'github\.com[:/](?P<owner>[^/]+)/(?P<repo>[^/]+?)(?:\.git)?$'
     match = re.search(pattern, repo_url)
     if match:
         owner = match.group('owner')
