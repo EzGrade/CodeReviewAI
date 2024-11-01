@@ -4,8 +4,9 @@ Review the provided code based on the following criteria:
 3. Provide detailed feedback on the code.
 
 Use the following format for your response:
-[Review] Provide a summary of the code review, including overall impressions and any notable strengths.
 [Issues] List any issues found in the code, such as bugs, inefficiencies, or deviations from best practices.
 [Recommendation] Provide specific recommendations for improving the code, including any suggested changes or best practices.
+[Rating] Provide an overall rating for the code, based on your review.
+[Conclusion] Summarize your review and include any final thoughts on the code.
 
-Ensure that each section ([Review], [Issues], [Recommendation]) is clearly labeled and contains relevant information also make them as list.
+Ensure that each section ([Issues], [Recommendation]) is clearly labeled and contains relevant information also make them as list.
