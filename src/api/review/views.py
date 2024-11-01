@@ -5,6 +5,9 @@ from starlette.responses import JSONResponse
 
 from api.review.models import Review
 from services.github_service import Github
+from services.openai_service import OpenAi
+from services.prompt_service import Prompt
+from utils.ai_response import parse_review_text
 from utils.url import extract_repo_from_url
 
 router = APIRouter()
@@ -22,4 +25,13 @@ async def review(request: Review):
         owner=repo_owner,
         repo=repo_name,
     )
-    return JSONResponse(content={"message": github_service.get_repository_files()})
+    prompt_service = Prompt(
+        assignment=assignment_description,
+        files_content=github_service.get_repository_files(),
+        candidate_level=candidate_level
+    )
+    openai_service = OpenAi(
+        context=prompt_service.get_prompt()
+    )
+    response = parse_review_text(openai_service.get_response())
+    return JSONResponse(content={"response": response})
