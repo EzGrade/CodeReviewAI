@@ -1,5 +1,5 @@
 import pytest
-from utils.util_url.url import extract_repo_from_url
+from url import extract_repo_from_url
 
 
 def test_valid_url_with_https():
