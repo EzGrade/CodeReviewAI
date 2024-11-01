@@ -3,7 +3,7 @@ from typing import Dict, Any
 
 
 def parse_review_text(text: str) -> Dict[str, Any]:
-    section_pattern = r"\[(Review|Issues|Recommendation(?:s)?)\]\n(.*?)(?=\n\[|$)"
+    section_pattern = r"\[(Issues|Recommendation(?:s)?|Rating|Conclusion)\]\n(.*?)(?=\n\[|$)"
     list_item_pattern = r"^\d+\.\s+(.*)"
 
     matches = re.findall(section_pattern, text, re.DOTALL)
