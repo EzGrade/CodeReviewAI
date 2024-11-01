@@ -1,4 +1,4 @@
-from utils.util_ai.ai_response import parse_review_text
+from ai_response import parse_review_text
 
 
 def test_parse_review_with_list_items():
