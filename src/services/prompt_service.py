@@ -1,14 +1,18 @@
 from typing import List, Dict
 
+import config
+
 
 class Prompt:
     def __init__(
             self,
-            system_prompt: str,
+            assignment: Dict[str, str],
             files_content: Dict[str, str],
-            candidate_level: str
+            candidate_level: str,
+            system_prompt: str = config.PROMPT
     ):
         self.system_prompt = system_prompt
+        self.assignment = assignment
         self.files_content = files_content
         self.candidate_level = candidate_level
 
@@ -29,10 +33,15 @@ class Prompt:
             "role": "system",
             "content": self.system_prompt,
         }
+        assignment_message: Dict[str, str] = {
+            "role": "system",
+            "content": f"Assignment: {self.assignment}"
+        }
         candidate_level_message: Dict[str, str] = {
             "role": "system",
             "content": f"Programmer Level: {self.candidate_level}"
         }
         messages.append(system_prompt_message)
+        messages.append(candidate_level_message)
         messages.extend(self.files_to_dict())
         return messages
