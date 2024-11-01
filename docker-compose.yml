@@ -9,3 +9,34 @@ services:
       - .env
     volumes:
       - .:/app
+    depends_on:
+      - redis
+    networks:
+      - default
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "$REDIS_PASSWORD", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+    networks:
+      - default
+
+volumes:
+  redis-data:
+    driver: local
+
+networks:
+  default:
+    driver: bridge
