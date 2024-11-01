@@ -20,11 +20,13 @@ async def review(request: Review):
     assignment_description = request.assignment_description
     repo_owner, repo_name = extract_repo_from_url(request.github_repo_url)
     candidate_level = request.candidate_level
+    force_reload_files = request.repository_force_reload_files
 
     try:
         github_service = Github(
             owner=repo_owner,
             repo=repo_name,
+            force_reload=force_reload_files
         )
     except ValueError as e:
         logger.error(f"Invalid GitHub repository URL: {e}")
