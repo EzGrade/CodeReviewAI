@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 import logging
 
+from openai import BadRequestError
 from starlette.responses import JSONResponse
 
 from api.review.models import Review
@@ -40,7 +41,12 @@ async def review(request: Review):
     openai_service = OpenAi(
         context=prompt_service.get_prompt()
     )
-    openai_response = openai_service.get_response()
+    try:
+        openai_response = openai_service.get_response()
+    except BadRequestError as e:
+        logger.error(f"OpenAI request error: {e}")
+        return JSONResponse(status_code=400, content={"detail": e.message})
+
     response = {
         "found_files": len(files),
     }

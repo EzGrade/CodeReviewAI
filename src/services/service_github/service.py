@@ -50,7 +50,7 @@ class Github:
             _owner = installation.get_repos()[0].owner.login
             if _owner == owner:
                 installation_id = installation.id
-                self.redis_client.set(cache_key, installation_id)
+                self.redis_client.set(cache_key, installation_id, ex=config.REDIS_CACHE_EXPIRATION)
                 return installation_id
 
         raise ValueError("Installation not found")
