@@ -56,7 +56,7 @@ steps:
    docker compose up -d web && docker compose exec web pytest
    ```
 
-## Questions answers:
+## Question answers:
 
 In anticipation of handling more than 100 review requests every in few seconds
 and dealing with a base source code with a greater number than 100, I recommend designing the system as follows.
