@@ -51,7 +51,7 @@ async def review(request: Review):
             status_code=422,
             content={"detail": "Invalid GitHub repository URL"}
         )
-    files = github_service.get_repository_files()
+    files = await github_service.get_repository_files()
     prompt_service = Prompt(
         assignment=assignment_description,
         files_content=files,
