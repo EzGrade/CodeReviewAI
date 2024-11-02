@@ -4,7 +4,9 @@ GitHub service
 import logging
 from typing import Dict
 
-from github import Auth, GithubIntegration
+from github import Auth
+from github import Github as GithubAPI
+from github.Repository import Repository
 
 import config
 from utils.util_redis.rd import RedisClient
@@ -21,49 +23,25 @@ class Github:
             self,
             owner: str,
             repo: str,
-            force_reload: bool = False
+            force_reload: bool = False,
+            github_api: GithubAPI = None
     ):
+        self.owner = owner
+        self.repo = repo
         self.redis_client = RedisClient()
         self.force_reload = force_reload
-        self.auth = Auth.AppAuth(
-            app_id=config.GITHUB_APP_ID,
-            private_key=config.GITHUB_PRIVATE_KEY,
-        )
+        self.auth = Auth.Token(token=config.GITHUB_TOKEN)
+        self.g = github_api or GithubAPI(auth=self.auth)
+        self.repository = self.get_repository()
 
-        self.app_client = GithubIntegration(auth=self.auth)
-        self.installation_id = self.get_installation_id(owner)
-        self.client = self.app_client.get_github_for_installation(
-            installation_id=self.installation_id,
-        )
-        self.repository = self.client.get_repo(f"{owner}/{repo}")
-
-    def get_installation_id(
-            self,
-            owner: str,
-    ) -> int:
+    def get_repository(
+            self
+    ) -> Repository:
         """
-        Get installation id for the repository
-        :param owner:
+        Get repository object
         :return:
         """
-        cache_key = f"installation_id_{owner}"
-        cached_id = self.redis_client.get(cache_key)
-        if cached_id:
-            logger.info(
-                "Installation ID found in cache for owner: %s",
-                owner
-            )
-            return int(cached_id)
-
-        installations = self.app_client.get_installations()
-        for installation in installations:
-            _owner = installation.get_repos()[0].owner.login
-            if _owner == owner:
-                installation_id = installation.id
-                self.redis_client.set(cache_key, installation_id, ex=config.REDIS_CACHE_EXPIRATION)
-                return installation_id
-
-        raise ValueError("Installation not found")
+        return self.g.get_repo(f"{self.owner}/{self.repo}")
 
     def get_repository_files(
             self,
