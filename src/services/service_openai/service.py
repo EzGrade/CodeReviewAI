@@ -1,10 +1,11 @@
 """
-Module to interact with OpenAI API
+Module to interact with OpenAI API (async version)
 """
 
 from typing import List, Dict
-
-import openai
+import aiohttp
+import asyncio
+import json
 
 import config
 import logger
@@ -14,7 +15,7 @@ logger = logger.get_logger(__name__)
 
 class OpenAi:
     """
-    Class to interact with OpenAI API
+    Class to interact with OpenAI API asynchronously
     """
 
     def __init__(
@@ -26,28 +27,26 @@ class OpenAi:
         self.context = context
         self.api_key = api_key
         self.model = model
-        self.client = self.get_openai_client()
+        self.api_url = "https://api.openai.com/v1/chat/completions"
 
-    def get_openai_client(self):
+    async def get_response(self) -> str:
         """
-        Get OpenAI client
-        :return:
-        """
-        return openai.OpenAI(
-            api_key=self.api_key
-        )
-
-    def get_response(
-            self,
-    ) -> str:
-        """
-        Get response from OpenAI
+        Get response from OpenAI asynchronously
         :return response: OpenAI response
         """
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=self.context
-        )
-        ai_message = response.choices[0].message.content
-        logger.info("AI response: %s", ai_message)
-        return ai_message
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "model": self.model,
+            "messages": self.context
+        }
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(self.api_url, headers=headers, json=payload) as response:
+                response.raise_for_status()
+                data = await response.json()
+                ai_message = data["choices"][0]["message"]["content"]
+                logger.info("AI response: %s", ai_message)
+                return ai_message
