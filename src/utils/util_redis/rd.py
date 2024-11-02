@@ -2,7 +2,7 @@
 Redis client
 """
 
-import redis
+import aioredis
 
 import config
 
@@ -23,14 +23,14 @@ class RedisClient:
         self.port: int = port
         self.db: str = db
         self.password: str = password
-        self.client: redis.Redis = redis.Redis(
+        self.client: aioredis.Redis = aioredis.Redis(
             host=self.host,
             port=self.port,
             db=self.db,
             decode_responses=True
         )
 
-    def set(self, key, value, ex=None) -> bool:
+    async def set(self, key, value, ex=None) -> bool:
         """
         Set key-value pair in Redis
         :param key:
@@ -38,35 +38,35 @@ class RedisClient:
         :param ex:
         :return:
         """
-        return self.client.set(key, value, ex=ex)
+        return await self.client.set(key, value, ex=ex)
 
-    def get(self, key) -> str:
+    async def get(self, key) -> str:
         """
         Get value by key
         :param key:
         :return:
         """
-        return self.client.get(key)
+        return await self.client.get(key)
 
-    def delete(self, key) -> int:
+    async def delete(self, key) -> int:
         """
         Delete key
         :param key:
         :return:
         """
-        return self.client.delete(key)
+        return await self.client.delete(key)
 
-    def exists(self, key) -> bool:
+    async def exists(self, key) -> bool:
         """
         Check if key exists
         :param key:
         :return:
         """
-        return self.client.exists(key)
+        return await self.client.exists(key)
 
-    def flushdb(self):
+    async def flushdb(self):
         """
         Flush database
         :return:
         """
-        return self.client.flushdb()
+        return await self.client.flushdb()
