@@ -12,7 +12,7 @@ def prompt_obj():
     Create a Prompt instance for testing
     :return:
     """
-    assignment = {"task": "Implement a feature"}
+    assignment = "Implement a feature"
     files_content = {
         "file1.py": "print('Hello, World!')",
         "file2.py": "def add(a, b): return a + b"
@@ -57,6 +57,10 @@ def test_get_prompt(prompt_obj):
         {
             "role": "system",
             "content": "This is a system prompt."
+        },
+        {
+            "role": "system",
+            "content": "Assignment: Implement a feature"
         },
         {
             "role": "system",

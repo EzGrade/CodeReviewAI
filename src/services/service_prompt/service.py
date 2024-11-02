@@ -15,7 +15,7 @@ class Prompt:
 
     def __init__(
             self,
-            assignment: Dict[str, str],
+            assignment: str,
             files_content: Dict[str, str],
             candidate_level: str,
             system_prompt: str = config.PROMPT
@@ -59,7 +59,7 @@ class Prompt:
             "content": f"Programmer Level: {self.candidate_level}"
         }
         messages.append(system_prompt_message)
-        messages.append(candidate_level_message)
         messages.append(assignment_message)
+        messages.append(candidate_level_message)
         messages.extend(self.files_to_dict())
         return messages
