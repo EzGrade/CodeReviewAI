@@ -1,3 +1,7 @@
+"""
+This module contains the configuration for the application.
+"""
+
 from utils.util_environment.environment import get_env_var
 
 LOGGING_LEVEL = get_env_var("LOGGING_LEVEL", default="DEBUG")

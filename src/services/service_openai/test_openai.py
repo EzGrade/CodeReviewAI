@@ -1,3 +1,7 @@
+"""
+Testing module for OpenAI service.
+"""
+
 import pytest
 from openai import AuthenticationError
 from services.service_openai.service import OpenAi
@@ -5,6 +9,11 @@ import config
 
 
 def test_get_openai_client():
+    """
+    Test get_openai_client method
+    Must return a valid OpenAI client
+    :return:
+    """
     openai_instance = OpenAi([], api_key=config.OPENAI_API_KEY)
     client = openai_instance.get_openai_client()
 
@@ -19,6 +28,11 @@ def test_get_openai_client():
 
 
 def test_invalid_api_key():
+    """
+    Test invalid API key
+    Must raise an AuthenticationError
+    :return:
+    """
     invalid_api_key = "invalid_api_key"
     openai_instance = OpenAi([], api_key=invalid_api_key)
     client = openai_instance.get_openai_client()

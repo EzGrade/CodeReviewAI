@@ -1,3 +1,7 @@
+"""
+Environment utility functions
+"""
+
 import os
 
 

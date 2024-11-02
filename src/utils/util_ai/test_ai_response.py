@@ -1,7 +1,15 @@
+"""
+Unit tests for the ai_response module.
+"""
+
 from ai_response import parse_review_text
 
 
 def test_parse_review_with_list_items():
+    """
+    Test parse_review_text function with list items
+    :return:
+    """
     text = """
 [Issues]
 1. This is the first issue.
@@ -35,6 +43,10 @@ Some conclusion here.
 
 
 def test_parse_review_without_list_items():
+    """
+    Test parse_review_text function without list items
+    :return:
+    """
     text = """
 [Issues]
 This is an issue without list items.
@@ -60,6 +72,10 @@ Some conclusion here.
 
 
 def test_parse_review_mixed_content():
+    """
+    Test parse_review_text function with mixed content
+    :return:
+    """
     text = """
 [Issues]
 This is an issue without list items.

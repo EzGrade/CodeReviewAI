@@ -1,5 +1,9 @@
+"""
+GitHub service
+"""
 import logging
 from typing import Dict
+import json
 
 from github import Auth, GithubIntegration
 
@@ -10,6 +14,10 @@ logger = logging.getLogger(__name__)
 
 
 class Github:
+    """
+    Class to interact with GitHub API
+    """
+
     def __init__(
             self,
             owner: str,
@@ -42,7 +50,10 @@ class Github:
         cache_key = f"installation_id_{owner}"
         cached_id = self.redis_client.get(cache_key)
         if cached_id:
-            logger.info(f"Installation ID found in cache for owner: {owner}")
+            logger.info(
+                "Installation ID found in cache for owner: %s",
+                owner
+            )
             return int(cached_id)
 
         installations = self.app_client.get_installations()
@@ -66,10 +77,20 @@ class Github:
         if not self.force_reload:
             cached_files = self.redis_client.get(cache_key)
             if cached_files:
-                logger.info(f"Repository files found in cache for repo: {self.repository.full_name}")
-                return eval(cached_files)
+                logger.info(
+                    "Repository files found in cache for repo: %s",
+                    self.repository.full_name
+                )
+                return json.loads(cached_files)
 
         def get_files_recursively(path: str, ref: str) -> Dict[str, str]:
+            """
+            Get files recursively
+            Means get files from the directory and subdirectories
+            :param path:
+            :param ref:
+            :return:
+            """
             files = self.repository.get_contents(path, ref=ref)
             context = {}
             for file in files:

@@ -1,3 +1,7 @@
+"""
+Tests for the review endpoint
+"""
+
 import pytest
 from fastapi.testclient import TestClient
 from main import app
@@ -7,6 +11,10 @@ client = TestClient(app)
 
 @pytest.fixture
 def review_data():
+    """
+    Review data fixture
+    :return:
+    """
     return {
         "assignment_description": "Test assignment",
         "github_repo_url": "https://github.com/test_owner/test_repo",
@@ -15,10 +23,28 @@ def review_data():
 
 
 def test_review_endpoint_valid_data(review_data, mocker):
-    mocker.patch('services.service_github.service.Github.__init__', return_value=None)
-    mocker.patch('services.service_github.service.Github.get_repository_files', return_value=["file1.py", "file2.py"])
-    mocker.patch('services.service_prompt.service.Prompt.get_prompt', return_value="Test prompt")
-    mocker.patch('services.service_openai.service.OpenAi.get_response', return_value="Test response")
+    """
+    Test review endpoint with valid data
+    :param review_data:
+    :param mocker:
+    :return:
+    """
+    mocker.patch(
+        'services.service_github.service.Github.__init__',
+        return_value=None
+    )
+    mocker.patch(
+        'services.service_github.service.Github.get_repository_files',
+        return_value=["file1.py", "file2.py"]
+    )
+    mocker.patch(
+        'services.service_prompt.service.Prompt.get_prompt',
+        return_value="Test prompt"
+    )
+    mocker.patch(
+        'services.service_openai.service.OpenAi.get_response',
+        return_value="Test response"
+    )
 
     response = client.post("/review", json=review_data)
     assert response.status_code == 200
@@ -26,6 +52,11 @@ def test_review_endpoint_valid_data(review_data, mocker):
 
 
 def test_review_endpoint_invalid_url(mocker):
+    """
+    Test review endpoint with invalid GitHub URL
+    :param mocker:
+    :return:
+    """
     review_data = {
         "assignment_description": "Test assignment",
         "github_repo_url": "https://github.com/invalid_owner/invalid_repo",
@@ -37,6 +68,10 @@ def test_review_endpoint_invalid_url(mocker):
 
 
 def test_review_endpoint_missing_fields():
+    """
+    Test review endpoint with missing fields
+    :return:
+    """
     review_data = {
         "assignment_description": "Test assignment",
         "github_repo_url": "https://github.com/test_owner/test_repo"

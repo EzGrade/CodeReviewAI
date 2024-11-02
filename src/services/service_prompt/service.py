@@ -1,9 +1,18 @@
+"""
+This module contains Prompt service.
+It allows to generate prompt messages for AI context.
+"""
+
 from typing import List, Dict
 
 import config
 
 
 class Prompt:
+    """
+    Class to generate prompt messages for AI context
+    """
+
     def __init__(
             self,
             assignment: Dict[str, str],
@@ -16,7 +25,11 @@ class Prompt:
         self.files_content = files_content
         self.candidate_level = candidate_level
 
-    def files_to_dict(self):
+    def files_to_dict(self) -> List[Dict[str, str]]:
+        """
+        Convert files content to list of messages
+        :return:
+        """
         messages = []
         for file_name, file_content in self.files_content.items():
             content = f"File: {file_name}\n{file_content}"
@@ -27,7 +40,11 @@ class Prompt:
             messages.append(context_prompt_message)
         return messages
 
-    def get_prompt(self):
+    def get_prompt(self) -> List[Dict[str, str]]:
+        """
+        Get prompt messages
+        :return:
+        """
         messages: List[Dict[str, str]] = []
         system_prompt_message: Dict[str, str] = {
             "role": "system",
@@ -43,5 +60,6 @@ class Prompt:
         }
         messages.append(system_prompt_message)
         messages.append(candidate_level_message)
+        messages.append(assignment_message)
         messages.extend(self.files_to_dict())
         return messages

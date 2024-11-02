@@ -1,5 +1,9 @@
-from fastapi import APIRouter
+"""
+Views for the review endpoint
+"""
+
 import logging
+from fastapi import APIRouter
 
 from openai import BadRequestError
 from starlette.responses import JSONResponse
@@ -17,7 +21,15 @@ logger = logging.getLogger(__name__)
 
 @router.post(path="/review")
 async def review(request: Review):
-    logger.debug(f"Review request: {request}")
+    """
+    Review POST endpoint
+    :param request:
+    :return:
+    """
+    logger.debug(
+        "Review request: %s",
+        request
+    )
     assignment_description = request.assignment_description
     repo_owner, repo_name = extract_repo_from_url(request.github_repo_url)
     candidate_level = request.candidate_level
@@ -30,8 +42,14 @@ async def review(request: Review):
             force_reload=force_reload_files
         )
     except ValueError as e:
-        logger.error(f"Invalid GitHub repository URL: {e}")
-        return JSONResponse(status_code=422, content={"detail": "Invalid GitHub repository URL"})
+        logger.error(
+            "Invalid GitHub repository URL: %s",
+            e
+        )
+        return JSONResponse(
+            status_code=422,
+            content={"detail": "Invalid GitHub repository URL"}
+        )
     files = github_service.get_repository_files()
     prompt_service = Prompt(
         assignment=assignment_description,
@@ -44,11 +62,24 @@ async def review(request: Review):
     try:
         openai_response = openai_service.get_response()
     except BadRequestError as e:
-        logger.error(f"OpenAI request error: {e}")
-        return JSONResponse(status_code=400, content={"detail": e.message})
+        logger.error(
+            "OpenAI request error: %s",
+            e
+        )
+        return JSONResponse(
+            status_code=400,
+            content={
+                "detail": e.message
+            }
+        )
 
     response = {
         "found_files": len(files),
     }
     response.update(parse_review_text(openai_response))
-    return JSONResponse(content={"response": response})
+    return JSONResponse(
+        status_code=200,
+        content={
+            "response": response
+        }
+    )

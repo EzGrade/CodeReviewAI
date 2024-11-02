@@ -1,8 +1,17 @@
+"""
+Util functions for AI response
+"""
+
 import re
 from typing import Dict, Any
 
 
 def parse_review_text(text: str) -> Dict[str, Any]:
+    """
+    Parse review text
+    :param text:
+    :return:
+    """
     section_pattern = r"\[(Issues|Recommendation(?:s)?|Rating|Conclusion)\]\n(.*?)(?=\n\[|$)"
     list_item_pattern = r"^\d+\.\s+(.*)"
 

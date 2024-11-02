@@ -1,9 +1,17 @@
+"""
+This module contains tests for the Prompt class.
+"""
+
 import pytest
 from services.service_prompt.service import Prompt
 
 
 @pytest.fixture
-def prompt():
+def prompt_obj():
+    """
+    Create a Prompt instance for testing
+    :return:
+    """
     assignment = {"task": "Implement a feature"}
     files_content = {
         "file1.py": "print('Hello, World!')",
@@ -20,7 +28,12 @@ def prompt():
     )
 
 
-def test_files_to_dict(prompt):
+def test_files_to_dict(prompt_obj):
+    """
+    Test files_to_dict method
+    :param prompt_obj:
+    :return:
+    """
     expected_messages = [
         {
             "role": "user",
@@ -31,10 +44,15 @@ def test_files_to_dict(prompt):
             "content": "File: file2.py\ndef add(a, b): return a + b"
         }
     ]
-    assert prompt.files_to_dict() == expected_messages
+    assert prompt_obj.files_to_dict() == expected_messages
 
 
-def test_get_prompt(prompt):
+def test_get_prompt(prompt_obj):
+    """
+    Test get_prompt method
+    :param prompt_obj:
+    :return:
+    """
     expected_messages = [
         {
             "role": "system",
@@ -53,4 +71,4 @@ def test_get_prompt(prompt):
             "content": "File: file2.py\ndef add(a, b): return a + b"
         }
     ]
-    assert prompt.get_prompt() == expected_messages
+    assert prompt_obj.get_prompt() == expected_messages

@@ -1,3 +1,7 @@
+"""
+Module to interact with OpenAI API
+"""
+
 from typing import List, Dict
 
 import openai
@@ -9,6 +13,10 @@ logger = logger.get_logger(__name__)
 
 
 class OpenAi:
+    """
+    Class to interact with OpenAI API
+    """
+
     def __init__(
             self,
             context: List[Dict[str, str]],
@@ -21,6 +29,10 @@ class OpenAi:
         self.client = self.get_openai_client()
 
     def get_openai_client(self):
+        """
+        Get OpenAI client
+        :return:
+        """
         return openai.OpenAI(
             api_key=self.api_key
         )
@@ -37,5 +49,5 @@ class OpenAi:
             messages=self.context
         )
         ai_message = response.choices[0].message.content
-        logger.info(f"AI response: {ai_message}")
+        logger.info("AI response: %s", ai_message)
         return ai_message

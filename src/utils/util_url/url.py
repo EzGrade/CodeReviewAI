@@ -1,3 +1,7 @@
+"""
+Utility functions for URL manipulation
+"""
+
 import re
 import logger
 
@@ -10,7 +14,10 @@ def extract_repo_from_url(repo_url: str) -> tuple:
     :param repo_url: GitHub repository URL
     :return: tuple containing owner and repo
     """
-    logger.debug(f"Extracting owner and repo from URL: {repo_url}")
+    logger.debug(
+        "Extracting owner and repo from URL: %s",
+        repo_url
+    )
 
     pattern = r'(?:https://github\.com/|git@github\.com:)(?P<owner>[^/]+)/(?P<repo>[^/.]+)'
     match = re.search(pattern, repo_url)
@@ -18,7 +25,7 @@ def extract_repo_from_url(repo_url: str) -> tuple:
     if match:
         owner = match.group('owner')
         repo = match.group('repo')
-        logger.debug(f"Extracted owner: {owner}, repo: {repo}")
+        logger.debug("Extracted owner: %s, repo: %s", owner, repo)
         return owner, repo
-    else:
-        raise ValueError("Invalid GitHub repository URL")
+
+    raise ValueError("Invalid GitHub repository URL")
