@@ -1,84 +1,53 @@
-"""
-Unit tests for Github service
-"""
-
-from unittest.mock import MagicMock
+from unittest.mock import patch, MagicMock
 import pytest
 from services.service_github.service import Github
 
 
 @pytest.fixture
-def mock_github_integration(mocker):
+def github_instance():
+    with patch('services.service_github.service.RedisClient') as MockRedisClient, \
+            patch('services.service_github.service.Auth') as MockAuth, \
+            patch('services.service_github.service.GithubAPI') as MockGithubAPI:
+        mock_redis_client = MockRedisClient.return_value
+        mock_auth = MockAuth.Token.return_value
+        mock_github_api = MockGithubAPI.return_value
+
+        # Mock the repo object and get_repo behavior
+        mock_repo = MagicMock()
+        mock_repo.default_branch = 'main'
+        mock_github_api.get_repo.return_value = mock_repo
+
+        # Inject the mock API client directly to avoid actual network calls
+        yield Github(owner='test_owner', repo='test_repo', github_api=mock_github_api)
+
+
+def test_get_repository_files_from_cache(github_instance):
     """
-    Mock GithubIntegration class
-    :param mocker:
-    :return:
+    Test if the repository files are retrieved from the cache.
     """
-    mock_github_integration = mocker.patch('services.service_github.service.GithubIntegration')
-    mock_github_integration_instance = mock_github_integration.return_value
-    mock_github_integration_instance.get_installations.return_value = [
-        MagicMock(id=123, get_repos=lambda: [MagicMock(owner=MagicMock(login='test_owner'))])
-    ]
-    return mock_github_integration_instance
+    github_instance.redis_client.get.return_value = "{'file1.txt': 'content1', 'file2.txt': 'content2'}"
+
+    files = github_instance.get_repository_files()
+
+    assert files == {'file1.txt': 'content1', 'file2.txt': 'content2'}
+    github_instance.redis_client.get.assert_called_once()
+    github_instance.repository.get_contents.assert_not_called()
 
 
-@pytest.fixture
-def mock_app_auth(mocker):
+def test_get_repository_files_from_github(github_instance):
     """
-    Mock AppAuth class
-    :param mocker:
-    :return:
+    Test if the repository files are retrieved from GitHub when the cache is empty.
     """
-    return mocker.patch('services.service_github.service.Auth.AppAuth')
+    github_instance.redis_client.get.return_value = None
+    mock_file = MagicMock()
+    mock_file.type = 'file'
+    mock_file.path = 'file1.txt'
+    mock_file.decoded_content = b'content1'
+    github_instance.repository.get_contents.return_value = [mock_file]
 
+    files = github_instance.get_repository_files()
 
-@pytest.fixture
-def github(mock_github_integration, mock_app_auth):
-    """
-    Create a Github instance for testing
-    :param mock_github_integration:
-    :param mock_app_auth:
-    :return:
-    """
-    mock_github_for_installation = mock_github_integration.get_github_for_installation.return_value
-    mock_repo = mock_github_for_installation.get_repo.return_value
-
-    def mock_get_contents(path, ref):
-        if path == "":
-            return [
-                MagicMock(type='file', path='file1.txt', decoded_content=b'content1'),
-                MagicMock(type='dir', path='dir1')
-            ]
-        if path == "dir1":
-            return [
-                MagicMock(type='file', path='dir1/file2.txt', decoded_content=b'content2')
-            ]
-        return []
-
-    mock_repo.get_contents.side_effect = mock_get_contents
-
-    return Github(owner='test_owner', repo='test_repo')
-
-
-def test_get_installation_id(github):
-    """
-    Test get_installation_id method
-    :param github:
-    :return:
-    """
-    installation_id = github.get_installation_id('test_owner')
-    assert installation_id == 123
-
-
-def test_get_repository_files(github):
-    """
-    Test get_repository_files method
-    :param github:
-    :return:
-    """
-    files = github.get_repository_files()
-    expected_files = {
-        'file1.txt': 'content1',
-        'dir1/file2.txt': 'content2'
-    }
-    assert files == expected_files
+    assert files == {'file1.txt': 'content1'}
+    github_instance.redis_client.get.assert_called_once()
+    github_instance.repository.get_contents.assert_called_once_with('', ref='main')
+    github_instance.redis_client.set.assert_called_once()
