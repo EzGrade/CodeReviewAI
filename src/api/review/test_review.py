@@ -4,7 +4,10 @@ Tests for the review endpoint
 
 import pytest
 from fastapi.testclient import TestClient
+from github import UnknownObjectException
+
 from main import app
+import github
 
 client = TestClient(app)
 
@@ -51,22 +54,6 @@ def test_review_endpoint_valid_data(review_data, mocker):
     assert response.json() == {"response": {'found_files': 2, 'raw_text': 'Test response'}}
 
 
-def test_review_endpoint_invalid_url(mocker):
-    """
-    Test review endpoint with invalid GitHub URL
-    :param mocker:
-    :return:
-    """
-    review_data = {
-        "assignment_description": "Test assignment",
-        "github_repo_url": "https://github.com/invalid_owner/invalid_repo",
-        "candidate_level": "junior"
-    }
-
-    response = client.post("/review", json=review_data)
-    assert response.status_code == 422
-
-
 def test_review_endpoint_missing_fields():
     """
     Test review endpoint with missing fields
@@ -79,3 +66,25 @@ def test_review_endpoint_missing_fields():
 
     response = client.post("/review", json=review_data)
     assert response.status_code == 422
+
+
+@pytest.fixture
+def invalid_repo_url_payload():
+    return {
+        "assignment_description": "Test assignment",
+        "github_repo_url": "https://github.com/invalid/repo",
+        "candidate_level": "junior",
+        "repository_force_reload_files": False
+    }
+
+
+def test_invalid_repo_url(invalid_repo_url_payload, mocker):
+    # Mock the GitHub class to raise UnknownObjectException
+    mocker.patch(
+        "services.service_github.service.Github.get_repository",
+        side_effect=UnknownObjectException(404, "Not Found", None)
+    )
+
+    response = client.post("/review", json=invalid_repo_url_payload)
+    assert response.status_code == 422
+    assert response.json() == {"detail": "Invalid GitHub repository URL"}

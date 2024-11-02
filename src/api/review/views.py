@@ -4,6 +4,7 @@ Views for the review endpoint
 
 import logging
 from fastapi import APIRouter
+from github import UnknownObjectException
 
 from openai import BadRequestError
 from starlette.responses import JSONResponse
@@ -41,7 +42,7 @@ async def review(request: Review):
             repo=repo_name,
             force_reload=force_reload_files
         )
-    except ValueError as e:
+    except UnknownObjectException as e:
         logger.error(
             "Invalid GitHub repository URL: %s",
             e
