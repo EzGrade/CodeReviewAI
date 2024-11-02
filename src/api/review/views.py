@@ -61,7 +61,7 @@ async def review(request: Review):
         context=prompt_service.get_prompt()
     )
     try:
-        openai_response = openai_service.get_response()
+        openai_response = await openai_service.get_response()
     except BadRequestError as e:
         logger.error(
             "OpenAI request error: %s",
