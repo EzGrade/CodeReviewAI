@@ -3,7 +3,6 @@ GitHub service
 """
 import logging
 from typing import Dict
-import json
 
 from github import Auth, GithubIntegration
 
@@ -81,7 +80,7 @@ class Github:
                     "Repository files found in cache for repo: %s",
                     self.repository.full_name
                 )
-                return json.loads(cached_files)
+                return eval(cached_files)
 
         def get_files_recursively(path: str, ref: str) -> Dict[str, str]:
             """
