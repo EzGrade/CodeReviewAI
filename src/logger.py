@@ -9,7 +9,7 @@ logging.basicConfig(
     level=logging.getLevelName(config.LOGGING_LEVEL),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler("logs.log"),
+        logging.FileHandler("/var/log/web/logs.log"),
         logging.StreamHandler()
     ]
 )
